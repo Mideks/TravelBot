@@ -79,10 +79,12 @@ async def send_show_premium_message(message: types.Message):
 
 
 async def send_content(chat_id: int, content: dict, city: str):
-    photo_path = content.get("photo_path")
-    text = f"{city}\n\n{content.get('text')}"
+    photo_path = content.get("photo")
+    text = (f"{city} - {content.get('title', '')}\n\n"
+            f"{content.get('text')}")
 
-    if len(text) > 4000:
+    if len(text) > 2048:
+        # todo: разделение текста на несколько частей? кнопки?
         text = "Извините, описание оказалось слишком длинным и я не смог его отправить :("
         await bot.send_message(chat_id, text)
         return
