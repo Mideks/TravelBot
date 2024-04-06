@@ -155,7 +155,9 @@ async def category_callback_handler(callback_query: types.CallbackQuery, callbac
         return
     else:
         city = cities_db.getByQuery({"city_name": city_name})[0]
-        content = random.choice(city[category])
+        content = city[category]
+        if isinstance(city[category], list):
+            content = random.choice(content)
 
         await send_content(callback_query.from_user.id, content, city_name)
 
