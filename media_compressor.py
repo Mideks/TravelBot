@@ -46,4 +46,4 @@ def process_images_in_folder(folder_path, max_size=1024, quality=85):
 
 
 # Пример использования
-process_images_in_folder("media", max_size=1024, quality=85)
+process_images_in_folder("media_old", max_size=1024, quality=85)
