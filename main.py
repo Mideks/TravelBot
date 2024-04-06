@@ -4,6 +4,7 @@ import asyncio
 import logging
 import sys
 
+from aiogram.fsm.context import FSMContext
 from pysondb import db
 
 from aiogram import Bot, Dispatcher, types
@@ -19,16 +20,8 @@ from markups import (get_categories_markup, get_premium_markup, get_show_premium
 TOKEN = os.getenv("BOT_TOKEN")
 
 cities_db = db.getDb("template.json")
-# users_db = db.getDb("users.json")
 
-# состояния юзеров, в данном случае выбранный город
-# todo: сохранять в файлик
-user_states = {}
-
-
-# All handlers should be attached to the Router (or Dispatcher)
 dp = Dispatcher()
-# Initialize Bot instance with a default parse mode which will be passed to all API calls
 bot = Bot(TOKEN, parse_mode=ParseMode.HTML)
 
 
@@ -107,7 +100,8 @@ async def send_content(chat_id: int, content: dict, city: str):
 
 
 @dp.callback_query(City.filter())
-async def city_callback_handler(callback_query: types.CallbackQuery, callback_data: City):
+async def city_callback_handler(callback_query: types.CallbackQuery,
+                                callback_data: City, state: FSMContext):
     # Извлекаем данные из callback_query
     city_name = callback_data.city_name
 
@@ -117,16 +111,16 @@ async def city_callback_handler(callback_query: types.CallbackQuery, callback_da
 
     city = cities_db.getByQuery({"city_name": city_name})[0]
 
-    # todo: по-хорошему в файлик бы
     # Запоминаем выбранный город,
-    user_states[f"{callback_query.from_user.id}:selected_city"] = city_name
+    await state.update_data(selected_city=city_name)
 
     await send_content(callback_query.from_user.id, city["description"], city_name)
     await callback_query.answer()
 
 
 @dp.callback_query(Category.filter())
-async def category_callback_handler(callback_query: types.CallbackQuery, callback_data: Category):
+async def category_callback_handler(
+        callback_query: types.CallbackQuery, callback_data: Category, state: FSMContext):
     # Извлекаем данные из callback_query
     category = callback_data.category_name
 
@@ -143,9 +137,9 @@ async def category_callback_handler(callback_query: types.CallbackQuery, callbac
         await callback_query.answer()
         return
 
-    # todo: адекватный выбор города
     # Вспоминаем какой город выбрали
-    city_name = user_states.get(f"{callback_query.from_user.id}:selected_city")
+    data = await state.get_data()
+    city_name = data["selected_city"]
 
     # Заглушка на случай, если кнопка нажата после перезапуска бота
     if not city_name:
