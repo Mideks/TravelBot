@@ -8,23 +8,27 @@ def get_categories_markup() -> InlineKeyboardMarkup:
     builder = \
         (InlineKeyboardBuilder()
          .button(text="История", callback_data=Category(category_name="history"))
-         .button(text="💎 Легенды", callback_data=Category(category_name="legends", is_premium=True))
+         .button(text="🔐 Галерея", callback_data=Category(category_name="", is_locked=True))
 
-         .button(text="🎲 Достопримечательности", callback_data=Category(category_name="attractions"))
-         .button(text="🎲 Интересные места", callback_data=Category(category_name="interesting_places"))
+         .button(text="🎲 Интересные факты", callback_data=Category(category_name="facts"))
+         .button(text="🎲 Места для фото", callback_data=Category(category_name="photo_places"))
 
-         .button(text="🎲 Памятники", callback_data=Category(category_name="monuments"))
-         .button(text="⏳ Интересные факты", callback_data=Category(category_name="fun_facts", is_locked=True))
+         .button(text="🔐 Погода сейчас", callback_data=Category(category_name="", is_locked=True))
+         .button(text="Климат", callback_data=Category(category_name="climate", is_locked=False))
 
-         .button(text="⏳ Местные праздники", callback_data=Category(category_name="holidays", is_locked=True))
-         .button(text="💎 Песни", callback_data=Category(category_name="songs", is_premium=True))
+         .button(text="🎲 Знаменитости", callback_data=Category(category_name="celebrities", is_locked=False))
+         .button(text="🎲 Местная кухня", callback_data=Category(category_name="local_cuisine", is_locked=False))
 
-         .button(text="💎 Погода", callback_data=Category(category_name="weather", is_premium=True))
-         .button(text="💎 Климат", callback_data=Category(category_name="climate", is_premium=True))
+         .button(text="Флора и фауна", callback_data=Category(category_name="nature", is_locked=False))
+         .button(text="🎲 Легенды", callback_data=Category(category_name="legends", is_locked=False))
 
-         .button(text="⏳ Как добраться", callback_data=Category(category_name="way", is_locked=True))
+         .button(text="🎲 Интересные места", callback_data=Category(category_name="interesting_places", is_locked=False))
+         .button(text="🎲 Местные праздники", callback_data=Category(category_name="local_holidays", is_locked=False))
 
-         .adjust(2, 2, 2, 2, 2, 1))
+         .button(text="🎲 Памятники", callback_data=Category(category_name="monuments", is_locked=False))
+         .button(text="🎲 Достопримечательности", callback_data=Category(category_name="attractions", is_locked=False))
+
+         .adjust(2))
 
     return builder.as_markup()
 

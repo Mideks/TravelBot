@@ -18,7 +18,7 @@ from markups import (get_categories_markup, get_premium_markup, get_show_premium
 
 TOKEN = os.getenv("BOT_TOKEN")
 
-cities_db = db.getDb("cities.json")
+cities_db = db.getDb("template.json")
 # users_db = db.getDb("users.json")
 
 # состояния юзеров, в данном случае выбранный город
