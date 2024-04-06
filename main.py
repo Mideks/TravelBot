@@ -5,6 +5,7 @@ import logging
 import sys
 
 from aiogram.fsm.context import FSMContext
+from aiogram.utils.media_group import MediaGroupBuilder
 from pysondb import db
 
 from aiogram import Bot, Dispatcher, types
@@ -72,32 +73,43 @@ async def send_show_premium_message(message: types.Message):
 
 
 async def send_content(chat_id: int, content: dict, city: str):
-    photo_path = content.get("photo")
     text = (f"{city} - {content.get('title', '')}\n\n"
             f"{content.get('text')}")
 
+    # текст не поместится в одно сообщение
     if len(text) > 2048:
         # todo: разделение текста на несколько частей? кнопки?
         text = "Извините, описание оказалось слишком длинным и я не смог его отправить :("
         await bot.send_message(chat_id, text)
         return
 
-    if not photo_path:
+    photos = content.get("photo")
+    # фотографии нет - отправляем просто текст
+    if not photos:
         await bot.send_message(chat_id, text, reply_markup=get_categories_markup())
-    else:
+        return
+
+    # если была дана простая строка - приводим к списку
+    if isinstance(photos, str):
+        photos = [photos]
+
+    # создаём группу фоток
+    media_group = MediaGroupBuilder()
+    for photo_path in photos:
         if not os.path.exists(photo_path):
             await bot.send_message(chat_id, "Извините, не удалось отправить картинку")
             print(f"photo_path = {photo_path} не существует")
-
+            continue
         photo = FSInputFile(photo_path)
+        media_group.add_photo(photo)
 
-        # текст не влезает в подпись - отправим отдельно
-        if len(text) > 1024:
-            await bot.send_photo(chat_id, photo)
-            await bot.send_message(chat_id, text, reply_markup=get_categories_markup())
-        else:
-            await bot.send_photo(chat_id, photo, caption=text, reply_markup=get_categories_markup())
+    # текст не влезает в подпись - отправим отдельно
+    if len(text) > 1024:
+        await bot.send_message(chat_id, text, reply_markup=get_categories_markup())
+    else:
+        media_group.caption = text
 
+    await bot.send_media_group(chat_id=chat_id, media=media_group.build())
 
 @dp.callback_query(City.filter())
 async def city_callback_handler(callback_query: types.CallbackQuery,

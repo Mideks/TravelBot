@@ -4,7 +4,7 @@
             "city_name": "Название города",
             "description": {
                 "text": "Тут краткое описание города",
-                "photo": "media/test.jpg"
+                "photo": ["media/test.jpg", "media/test.jpg"]
             },
             "location": {
                 "latitude": 11.1111,
