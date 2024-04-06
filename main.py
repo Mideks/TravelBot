@@ -8,7 +8,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.utils.media_group import MediaGroupBuilder
 from pysondb import db
 
-from aiogram import Bot, Dispatcher, types
+from aiogram import Bot, Dispatcher, types, F
 from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
 from aiogram.filters.command import Command
@@ -102,6 +102,7 @@ async def send_content(chat_id: int, content: dict, city: str):
     else:
         await bot.send_photo(chat_id=chat_id, photo=photo, caption=text, reply_markup=get_categories_markup())
 
+
 @dp.callback_query(City.filter())
 async def city_callback_handler(callback_query: types.CallbackQuery,
                                 callback_data: City, state: FSMContext):
@@ -121,24 +122,26 @@ async def city_callback_handler(callback_query: types.CallbackQuery,
     await callback_query.answer()
 
 
+@dp.callback_query(Category.filter(F.is_premium))
+async def premium_category_callback_handler(callback_query: types.CallbackQuery):
+    # todo: добавить проверку на премиум у юзера
+    text = "Этот функционал доступен только в подписке! (/premium)"
+    await callback_query.message.answer(text, reply_markup=get_show_premium_markup())
+    await callback_query.answer()
+
+
+@dp.callback_query(Category.filter(F.is_locked))
+async def locked_category_callback_handler(callback_query: types.CallbackQuery):
+    text = "Этот функционал находится в разработке..."
+    await callback_query.message.answer(text)
+    await callback_query.answer()
+
+
 @dp.callback_query(Category.filter())
 async def category_callback_handler(
         callback_query: types.CallbackQuery, callback_data: Category, state: FSMContext):
     # Извлекаем данные из callback_query
     category = callback_data.category_name
-
-    # todo: добавить проверку на премиум у юзера
-    if callback_data.is_premium:
-        text = "Этот функционал доступен только в подписке! (/premium)"
-        await callback_query.message.answer(text, reply_markup=get_show_premium_markup())
-        await callback_query.answer()
-        return
-
-    elif callback_data.is_locked:
-        text = "Этот функционал находится в разработке..."
-        await callback_query.message.answer(text)
-        await callback_query.answer()
-        return
 
     # Вспоминаем какой город выбрали
     data = await state.get_data()
@@ -148,8 +151,6 @@ async def category_callback_handler(
     if not city_name:
         text = "Что-то пошло не так... попробуй выбрать город снова"
         await callback_query.message.answer(text)
-        await callback_query.answer()
-        return
     else:
         city = cities_db.getByQuery({"city_name": city_name})[0]
         content = city[category]
