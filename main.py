@@ -83,33 +83,24 @@ async def send_content(chat_id: int, content: dict, city: str):
         await bot.send_message(chat_id, text)
         return
 
-    photos = content.get("photo")
+    photo_path = content.get("photo")
     # фотографии нет - отправляем просто текст
-    if not photos:
+    if not photo_path:
         await bot.send_message(chat_id, text, reply_markup=get_categories_markup())
         return
 
-    # если была дана простая строка - приводим к списку
-    if isinstance(photos, str):
-        photos = [photos]
+    if not os.path.exists(photo_path):
+        await bot.send_message(chat_id, "Извините, не удалось отправить картинку")
+        print(f"photo_path = {photo_path} не существует")
 
-    # создаём группу фоток
-    media_group = MediaGroupBuilder()
-    for photo_path in photos:
-        if not os.path.exists(photo_path):
-            await bot.send_message(chat_id, "Извините, не удалось отправить картинку")
-            print(f"photo_path = {photo_path} не существует")
-            continue
-        photo = FSInputFile(photo_path)
-        media_group.add_photo(photo)
+    photo = FSInputFile(photo_path)
 
     # текст не влезает в подпись - отправим отдельно
     if len(text) > 1024:
         await bot.send_message(chat_id, text, reply_markup=get_categories_markup())
+        await bot.send_photo(chat_id=chat_id, photo=photo, caption=text)
     else:
-        media_group.caption = text
-
-    await bot.send_media_group(chat_id=chat_id, media=media_group.build())
+        await bot.send_photo(chat_id=chat_id, photo=photo, caption=text, reply_markup=get_categories_markup())
 
 @dp.callback_query(City.filter())
 async def city_callback_handler(callback_query: types.CallbackQuery,
