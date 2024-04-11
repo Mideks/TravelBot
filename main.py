@@ -92,6 +92,7 @@ async def send_content(chat_id: int, content: dict, city: str):
     if not os.path.exists(photo_path):
         await bot.send_message(chat_id, "Извините, не удалось отправить картинку")
         print(f"photo_path = {photo_path} не существует")
+        return
 
     photo = FSInputFile(photo_path)
 
