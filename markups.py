@@ -25,8 +25,8 @@ def get_categories_markup() -> InlineKeyboardMarkup:
          .button(text="🎲 Интересные места", callback_data=Category(category_name="interesting_places", is_locked=False))
          .button(text="🎲 Местные праздники", callback_data=Category(category_name="local_holidays", is_locked=False))
 
-         .button(text="🎲 Памятники", callback_data=Category(category_name="monuments", is_locked=False))
-         .button(text="🎲 Достопримечательности", callback_data=Category(category_name="attractions", is_locked=False))
+         .button(text="🔐 Памятники", callback_data=Category(category_name="monuments", is_locked=True))
+         .button(text="🔐 Достопримечательности", callback_data=Category(category_name="attractions", is_locked=True))
 
          .adjust(2))
 
