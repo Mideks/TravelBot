@@ -5,7 +5,6 @@ import logging
 import sys
 
 from aiogram.fsm.context import FSMContext
-from aiogram.utils.media_group import MediaGroupBuilder
 from pysondb import db
 
 from aiogram import Bot, Dispatcher, types
