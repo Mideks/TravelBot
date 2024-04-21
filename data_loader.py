@@ -3,25 +3,28 @@ import json
 from city_data import *
 
 
-def load_city(path: str) -> CityData:
-    with open(path, 'r', encoding='utf-8') as file:
+def load_city(city_path: str, city_file_name: str = 'city_data.json') -> CityData:
+    # Construct the full path to the city file
+    city_file_path = f"{city_path}/{city_file_name}"
+
+    with open(city_file_path, 'r', encoding='utf-8') as file:
         data = json.load(file)
 
     city_data = CityData(
-        city_name=data['city_name'],
-        description=Content(**data['description']),
-        location=Location(**data['location']),
-        history=Content(**data['history']),
-        facts=[Fact(**fact) for fact in data['facts']],
-        climate=Content(**data['climate']),
-        photo_places=[PhotoPlace(**photo_place) for photo_place in data['photo_places']],
-        celebrities=[Celebrity(**celebrity) for celebrity in data['celebrities']],
-        local_cuisine=[LocalCuisine(**local_cuisine) for local_cuisine in data['local_cuisine']],
-        nature=[Nature(**nature) for nature in data['nature']],
-        legends=[Legend(**legend) for legend in data['legends']],
-        local_holidays=[LocalHoliday(**local_holiday) for local_holiday in data['local_holidays']],
-        interesting_places=[InterestingPlace(**interesting_place) for interesting_place in data['interesting_places']]
+        city_path,
+        data['city_name'],
+        CityData.Content(city_path, **data['description']),
+        CityData.Location(**data['location']),
+        CityData.Content(city_path, **data['history']),
+        [CityData.Fact(city_path, **fact) for fact in data['facts']],
+        CityData.Content(city_path, **data['climate']),
+        [CityData.PhotoPlace(city_path, **photo_place) for photo_place in data['photo_places']],
+        [CityData.Celebrity(city_path, **celebrity) for celebrity in data['celebrities']],
+        [CityData.LocalCuisine(city_path, **local_cuisine) for local_cuisine in data['local_cuisine']],
+        [CityData.Nature(city_path, **nature) for nature in data['nature']],
+        [CityData.Legend(city_path, **legend) for legend in data['legends']],
+        [CityData.LocalHoliday(city_path, **local_holiday) for local_holiday in data['local_holidays']],
+        [CityData.InterestingPlace(city_path, **interesting_place) for interesting_place in data['interesting_places']]
     )
 
     return city_data
-
