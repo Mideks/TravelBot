@@ -1,4 +1,5 @@
 import json
+import os
 
 from city_data import *
 
@@ -28,3 +29,16 @@ def load_city(city_path: str, city_file_name: str = 'city_data.json') -> CityDat
     )
 
     return city_data
+
+
+def load_all_cities(parent_folder_path: str) -> list:
+    loaded_cities = []
+
+    items_in_parent_folder = os.listdir(parent_folder_path)
+
+    for city_folder in items_in_parent_folder:
+        city_path = os.path.join(parent_folder_path, city_folder)
+        city_data = load_city(city_path)
+        loaded_cities.append(city_data)
+
+    return loaded_cities
