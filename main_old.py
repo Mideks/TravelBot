@@ -1,22 +1,20 @@
-import random
-import os
 import asyncio
 import logging
+import os
+import random
 import sys
-
-from aiogram.fsm.context import FSMContext
-from pysondb import db
 
 from aiogram import Bot, Dispatcher, types
 from aiogram.enums import ParseMode
-from aiogram.filters import CommandStart
 from aiogram.filters.command import Command
-from aiogram.types import Message, FSInputFile
+from aiogram.fsm.context import FSMContext
+from aiogram.types import FSInputFile
+from pysondb import db
 
+import texts.messages
 from callback_data import Category, City, SelectCity, ShowPremiumInfo
 from markups import (get_categories_markup, get_premium_markup, get_show_premium_markup,
-                     get_cities_markup, get_greeting_markup)
-import texts.messages
+                     get_cities_markup)
 
 TOKEN = os.getenv("BOT_TOKEN")
 
@@ -26,15 +24,8 @@ dp = Dispatcher()
 bot = Bot(TOKEN, parse_mode=ParseMode.HTML)
 
 
-@dp.message(CommandStart())
-async def command_start_handler(message: Message) -> None:
-    text = texts.messages.start
-    await message.answer(text, reply_markup=get_greeting_markup())
-
-
-# todo: не тут это должно быть (а может и тут...)
 @dp.callback_query(SelectCity.filter())
-async def city_select_callback_handler(callback_query: types.CallbackQuery, callback_data: ShowPremiumInfo):
+async def city_select_callback_handler(callback_query: types.CallbackQuery):
     await send_select_city_message(callback_query.message)
     await callback_query.answer()
 
@@ -50,21 +41,10 @@ async def send_select_city_message(message: types.Message):
     await message.answer(text, reply_markup=get_cities_markup(cities))
 
 
-# todo: подписки по сути нет
 @dp.callback_query(ShowPremiumInfo.filter())
-async def show_premium_callback_handler(callback_query: types.CallbackQuery, callback_data: ShowPremiumInfo):
-    await send_show_premium_message(callback_query.message)
+async def show_premium_callback_handler(callback_query: types.CallbackQuery):
+    await callback_query.message.answer(texts.messages.premium_info, reply_markup=get_premium_markup())
     await callback_query.answer()
-
-
-@dp.message(Command("premium"))
-async def premium_command_handler(message: types.Message):
-    await send_show_premium_message(message)
-
-
-async def send_show_premium_message(message: types.Message):
-    text = (texts.messages.premium_info)
-    await message.answer(text, reply_markup=get_premium_markup())
 
 
 async def send_content(chat_id: int, content: dict, city: str):
