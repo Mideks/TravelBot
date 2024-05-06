@@ -1,1 +1,1 @@
-import commands, deprecated
+from . import commands, deprecated

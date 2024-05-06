@@ -5,8 +5,9 @@ from aiogram import Router, types
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import FSInputFile, Message
-from pysondb import db
+from pysondb import db as old_db
 
+import db.data_loader
 import texts.messages
 from callback_data import SelectCity, ShowPremiumInfo, City, Category
 from markups import get_premium_markup, get_cities_markup, get_categories_markup, \
@@ -14,7 +15,8 @@ from markups import get_premium_markup, get_cities_markup, get_categories_markup
 
 router = Router()
 
-cities_db = db.getDb("data/template.json")
+cities_db = old_db.getDb("data/template.json")
+cities = db.data_loader.load_all_cities('data/cities')
 
 
 @router.callback_query(SelectCity.filter())
