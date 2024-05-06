@@ -16,6 +16,7 @@ from aiogram.types import Message, FSInputFile
 from callback_data import Category, City, SelectCity, ShowPremiumInfo
 from markups import (get_categories_markup, get_premium_markup, get_show_premium_markup,
                      get_cities_markup, get_greeting_markup)
+import texts.messages
 
 TOKEN = os.getenv("BOT_TOKEN")
 
@@ -27,9 +28,7 @@ bot = Bot(TOKEN, parse_mode=ParseMode.HTML)
 
 @dp.message(CommandStart())
 async def command_start_handler(message: Message) -> None:
-    text = (f"Привет, путешественник!\n"
-            f"Я здесь, чтобы познакомить тебя с разными городами России и помочь тебе в дальнейшем путешествии!\n"
-            f"Нажми на кнопку ниже, чтобы отправиться в путешествие! (или /city)")
+    text = texts.messages.start
     await message.answer(text, reply_markup=get_greeting_markup())
 
 
@@ -46,7 +45,7 @@ async def city_select_command_handler(message: types.Message):
 
 
 async def send_select_city_message(message: types.Message):
-    text: str = "О каком городе ты хочешь узнать сегодня?"
+    text = texts.messages.selecting_city
     cities = [city.get("city_name") for city in cities_db.getAll()]
     await message.answer(text, reply_markup=get_cities_markup(cities))
 
@@ -64,10 +63,7 @@ async def premium_command_handler(message: types.Message):
 
 
 async def send_show_premium_message(message: types.Message):
-    text = ("Привет, путешественник! С премиум подпиской ты сможешь получить "
-            "множество дополнительного функционала, такого как:\n"
-            "Климат города, актуальная погода в городе, и многое другое!\n"
-            "И всё это всего за 149 рублей!")
+    text = (texts.messages.premium_info)
     await message.answer(text, reply_markup=get_premium_markup())
 
 
@@ -78,7 +74,7 @@ async def send_content(chat_id: int, content: dict, city: str):
     # текст не поместится в одно сообщение
     if len(text) > 2048:
         # todo: разделение текста на несколько частей? кнопки?
-        text = "Извините, описание оказалось слишком длинным и я не смог его отправить :("
+        text = texts.messages.long_text_error
         await bot.send_message(chat_id, text)
         return
 
@@ -89,7 +85,7 @@ async def send_content(chat_id: int, content: dict, city: str):
         return
 
     if not os.path.exists(photo_path):
-        await bot.send_message(chat_id, "Извините, не удалось отправить картинку")
+        await bot.send_message(chat_id, texts.messages.photo_not_exists_error)
         print(f"photo_path = {photo_path} не существует")
         return
 
@@ -129,13 +125,13 @@ async def category_callback_handler(
 
     # todo: добавить проверку на премиум у юзера
     if callback_data.is_premium:
-        text = "Этот функционал доступен только в подписке! (/premium)"
+        text = texts.messages.premium_funtionality
         await callback_query.message.answer(text, reply_markup=get_show_premium_markup())
         await callback_query.answer()
         return
 
     elif callback_data.is_locked:
-        text = "Этот функционал находится в разработке..."
+        text = texts.messages.not_implemented_functionality
         await callback_query.message.answer(text)
         await callback_query.answer()
         return
@@ -146,7 +142,7 @@ async def category_callback_handler(
 
     # Заглушка на случай, если кнопка нажата после перезапуска бота
     if not city_name:
-        text = "Что-то пошло не так... попробуй выбрать город снова"
+        text = texts.messages.city_selecting_error
         await callback_query.message.answer(text)
         await callback_query.answer()
         return
