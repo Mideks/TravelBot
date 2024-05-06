@@ -1,7 +1,6 @@
-import json
 import os
 
-from city_data import *
+from db.city_data import *
 
 
 def load_city(city_path: str, city_file_name: str = 'city_data.json') -> CityData:

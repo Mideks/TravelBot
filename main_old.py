@@ -19,7 +19,7 @@ from markups import (get_categories_markup, get_premium_markup, get_show_premium
 
 TOKEN = os.getenv("BOT_TOKEN")
 
-cities_db = db.getDb("template.json")
+cities_db = db.getDb("data/template.json")
 
 dp = Dispatcher()
 bot = Bot(TOKEN, parse_mode=ParseMode.HTML)
