@@ -14,7 +14,7 @@ def get_categories_markup() -> InlineKeyboardMarkup:
          .button(text="🎲 Места для фото", callback_data=Category(category_name="photo_places"))
 
          .button(text="🔐 Погода сейчас", callback_data=Category(category_name="", is_locked=True))
-         .button(text="Климат", callback_data=Category(category_name="climate", is_locked=False))
+         .button(text="💎 Климат", callback_data=Category(category_name="climate", is_locked=False, is_premium=True))
 
          .button(text="🎲 Знаменитости", callback_data=Category(category_name="celebrities", is_locked=False))
          .button(text="🎲 Местная кухня", callback_data=Category(category_name="local_cuisine", is_locked=False))

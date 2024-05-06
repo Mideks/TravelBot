@@ -1,7 +1,7 @@
 import os
 import random
 
-from aiogram import Router, types
+from aiogram import Router, types, F
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import FSInputFile, Message
@@ -42,6 +42,7 @@ async def show_premium_callback_handler(callback_query: types.CallbackQuery):
     await callback_query.answer()
 
 
+# todo: переработать: разные категории -- разный интерфейс
 async def send_content(message: Message, content: CityData.Content, city: str):
     text = (f"{city} - {content.title}\n\n"
             f"{content.text}")
@@ -77,8 +78,6 @@ async def send_content(message: Message, content: CityData.Content, city: str):
 @router.callback_query(City.filter())
 async def city_callback_handler(callback_query: types.CallbackQuery,
                                 callback_data: City, state: FSMContext):
-    # Извлекаем данные из callback_query
-
     if callback_data.is_random_city:
         city = random.choice(cities)
         city_name = city.city_name
@@ -93,24 +92,26 @@ async def city_callback_handler(callback_query: types.CallbackQuery,
     await callback_query.answer()
 
 
+@router.callback_query(Category.filter(F.is_premium))
+async def premium_only_callback_handler(callback_query: types.CallbackQuery):
+    # todo: добавить проверку на премиум у юзера
+    text = texts.messages.premium_funtionality
+    await callback_query.message.answer(text, reply_markup=get_show_premium_markup())
+    await callback_query.answer()
+
+
+@router.callback_query(Category.filter(F.is_locked))
+async def locked_callback_handler(callback_query: types.CallbackQuery):
+    text = texts.messages.not_implemented_functionality
+    await callback_query.message.answer(text)
+    await callback_query.answer()
+
+
 @router.callback_query(Category.filter())
 async def category_callback_handler(
         callback_query: types.CallbackQuery, callback_data: Category, state: FSMContext):
     # Извлекаем данные из callback_query
     category = callback_data.category_name
-
-    # todo: добавить проверку на премиум у юзера
-    if callback_data.is_premium:
-        text = texts.messages.premium_funtionality
-        await callback_query.message.answer(text, reply_markup=get_show_premium_markup())
-        await callback_query.answer()
-        return
-
-    elif callback_data.is_locked:
-        text = texts.messages.not_implemented_functionality
-        await callback_query.message.answer(text)
-        await callback_query.answer()
-        return
 
     # Вспоминаем какой город выбрали
     data = await state.get_data()
