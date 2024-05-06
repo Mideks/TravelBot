@@ -1,36 +1,31 @@
-import asyncio
-import logging
 import os
 import random
-import sys
 
-from aiogram import Bot, Dispatcher, types
-from aiogram.enums import ParseMode
-from aiogram.filters.command import Command
+from aiogram import Router, types
+from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import FSInputFile
+
 from pysondb import db
 
 import texts.messages
-from callback_data import Category, City, SelectCity, ShowPremiumInfo
-from markups import (get_categories_markup, get_premium_markup, get_show_premium_markup,
-                     get_cities_markup)
+from callback_data import SelectCity, ShowPremiumInfo, City, Category
+from main import bot
+from markups import get_premium_markup, get_cities_markup, get_categories_markup, \
+    get_show_premium_markup
 
-TOKEN = os.getenv("BOT_TOKEN")
+router = Router()
 
 cities_db = db.getDb("data/template.json")
 
-dp = Dispatcher()
-bot = Bot(TOKEN, parse_mode=ParseMode.HTML)
 
-
-@dp.callback_query(SelectCity.filter())
+@router.callback_query(SelectCity.filter())
 async def city_select_callback_handler(callback_query: types.CallbackQuery):
     await send_select_city_message(callback_query.message)
     await callback_query.answer()
 
 
-@dp.message(Command("city"))
+@router.message(Command("city"))
 async def city_select_command_handler(message: types.Message):
     await send_select_city_message(message)
 
@@ -41,7 +36,7 @@ async def send_select_city_message(message: types.Message):
     await message.answer(text, reply_markup=get_cities_markup(cities))
 
 
-@dp.callback_query(ShowPremiumInfo.filter())
+@router.callback_query(ShowPremiumInfo.filter())
 async def show_premium_callback_handler(callback_query: types.CallbackQuery):
     await callback_query.message.answer(texts.messages.premium_info, reply_markup=get_premium_markup())
     await callback_query.answer()
@@ -78,7 +73,8 @@ async def send_content(chat_id: int, content: dict, city: str):
     else:
         await bot.send_photo(chat_id=chat_id, photo=photo, caption=text, reply_markup=get_categories_markup())
 
-@dp.callback_query(City.filter())
+
+@router.callback_query(City.filter())
 async def city_callback_handler(callback_query: types.CallbackQuery,
                                 callback_data: City, state: FSMContext):
     # Извлекаем данные из callback_query
@@ -97,7 +93,7 @@ async def city_callback_handler(callback_query: types.CallbackQuery,
     await callback_query.answer()
 
 
-@dp.callback_query(Category.filter())
+@router.callback_query(Category.filter())
 async def category_callback_handler(
         callback_query: types.CallbackQuery, callback_data: Category, state: FSMContext):
     # Извлекаем данные из callback_query
@@ -135,13 +131,3 @@ async def category_callback_handler(
         await send_content(callback_query.from_user.id, content, city_name)
 
     await callback_query.answer()
-
-
-async def main() -> None:
-    # And the run events dispatching
-    await dp.start_polling(bot)
-
-
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO, stream=sys.stdout)
-    asyncio.run(main())

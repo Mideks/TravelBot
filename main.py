@@ -12,11 +12,12 @@ import routers
 TOKEN = getenv("BOT_TOKEN")
 dp = Dispatcher()
 
+bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+
 
 async def main() -> None:
-    bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
-
     dp.include_router(routers.commands.router)
+    dp.include_router(routers.deprecated.router)
 
     await dp.start_polling(bot)
 
