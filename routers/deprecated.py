@@ -4,13 +4,11 @@ import random
 from aiogram import Router, types
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
-from aiogram.types import FSInputFile
-
+from aiogram.types import FSInputFile, Message
 from pysondb import db
 
 import texts.messages
 from callback_data import SelectCity, ShowPremiumInfo, City, Category
-from main import bot
 from markups import get_premium_markup, get_cities_markup, get_categories_markup, \
     get_show_premium_markup
 
@@ -42,7 +40,7 @@ async def show_premium_callback_handler(callback_query: types.CallbackQuery):
     await callback_query.answer()
 
 
-async def send_content(chat_id: int, content: dict, city: str):
+async def send_content(message: Message, content: dict, city: str):
     text = (f"{city} - {content.get('title', '')}\n\n"
             f"{content.get('text')}")
 
@@ -50,17 +48,17 @@ async def send_content(chat_id: int, content: dict, city: str):
     if len(text) > 2048:
         # todo: разделение текста на несколько частей? кнопки?
         text = texts.messages.long_text_error
-        await bot.send_message(chat_id, text)
+        await message.answer(text)
         return
 
     photo_path = content.get("photo")
     # фотографии нет - отправляем просто текст
     if not photo_path:
-        await bot.send_message(chat_id, text, reply_markup=get_categories_markup())
+        await message.answer(text, reply_markup=get_categories_markup())
         return
 
     if not os.path.exists(photo_path):
-        await bot.send_message(chat_id, texts.messages.photo_not_exists_error)
+        await message.answer(texts.messages.photo_not_exists_error)
         print(f"photo_path = {photo_path} не существует")
         return
 
@@ -68,10 +66,10 @@ async def send_content(chat_id: int, content: dict, city: str):
 
     # текст не влезает в подпись - отправим отдельно
     if len(text) > 1024:
-        await bot.send_message(chat_id, text, reply_markup=get_categories_markup())
-        await bot.send_photo(chat_id=chat_id, photo=photo, caption=text)
+        await message.answer(text, reply_markup=get_categories_markup())
+        await message.answer_photo(photo=photo, caption=text)
     else:
-        await bot.send_photo(chat_id=chat_id, photo=photo, caption=text, reply_markup=get_categories_markup())
+        await message.answer_photo(photo=photo, caption=text, reply_markup=get_categories_markup())
 
 
 @router.callback_query(City.filter())
@@ -89,7 +87,7 @@ async def city_callback_handler(callback_query: types.CallbackQuery,
     # Запоминаем выбранный город,
     await state.update_data(selected_city=city_name)
 
-    await send_content(callback_query.from_user.id, city["description"], city_name)
+    await send_content(callback_query.message, city["description"], city_name)
     await callback_query.answer()
 
 
@@ -128,6 +126,6 @@ async def category_callback_handler(
         if isinstance(city[category], list):
             content = random.choice(content)
 
-        await send_content(callback_query.from_user.id, content, city_name)
+        await send_content(callback_query.message, content, city_name)
 
     await callback_query.answer()
