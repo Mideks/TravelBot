@@ -3,7 +3,6 @@ import random
 
 from aiogram import Router, types, F
 from aiogram.filters import Command
-from aiogram.fsm.context import FSMContext
 from aiogram.types import FSInputFile, Message
 
 import db.data_loader
@@ -12,6 +11,7 @@ from callback_data import SelectCity, ShowPremiumInfo, City, Category
 from db.city_data import CityData
 from markups import get_premium_markup, get_cities_markup, get_categories_markup, \
     get_show_premium_markup
+from states.state_data import StateData
 
 router = Router()
 
@@ -77,7 +77,7 @@ async def send_content(message: Message, content: CityData.Content, city: str):
 
 @router.callback_query(City.filter())
 async def city_callback_handler(callback_query: types.CallbackQuery,
-                                callback_data: City, state: FSMContext):
+                                callback_data: City, state_data: StateData):
     if callback_data.is_random_city:
         city = random.choice(cities)
         city_name = city.city_name
@@ -86,8 +86,7 @@ async def city_callback_handler(callback_query: types.CallbackQuery,
         city = next((obj for obj in cities if obj.city_name == city_name), None)
 
     # Запоминаем выбранный город,
-    await state.update_data(selected_city=city_name)
-
+    state_data.selected_city = city_name
     await send_content(callback_query.message, city.description, city_name)
     await callback_query.answer()
 
@@ -109,13 +108,12 @@ async def locked_callback_handler(callback_query: types.CallbackQuery):
 
 @router.callback_query(Category.filter())
 async def category_callback_handler(
-        callback_query: types.CallbackQuery, callback_data: Category, state: FSMContext):
+        callback_query: types.CallbackQuery, callback_data: Category, state_data: StateData):
     # Извлекаем данные из callback_query
     category = callback_data.category_name
 
     # Вспоминаем какой город выбрали
-    data = await state.get_data()
-    city_name = data["selected_city"]
+    city_name = state_data.selected_city
 
     # Заглушка на случай, если кнопка нажата после перезапуска бота
     if not city_name:
