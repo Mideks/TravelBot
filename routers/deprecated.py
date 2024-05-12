@@ -8,6 +8,7 @@ from aiogram.types import FSInputFile, Message
 import db.data_loader
 import texts.messages
 from callback_data import SelectCity, ShowPremiumInfo, City, Category
+from utils.content import content_text_cutter
 from db.city_data import CityData
 from markups import get_premium_markup, get_cities_markup, get_categories_markup, \
     get_show_premium_markup
@@ -43,35 +44,21 @@ async def show_premium_callback_handler(callback_query: types.CallbackQuery):
 
 
 # todo: переработать: разные категории -- разный интерфейс
-async def send_content(message: Message, content: CityData.Content, city: str):
-    text = (f"{city} - {content.title}\n\n"
-            f"{content.text}")
-
-    # текст не поместится в одно сообщение
-    if len(text) > 2048:
-        # todo: разделение текста на несколько частей? кнопки?
-        text = texts.messages.long_text_error
-        await message.answer(text)
-        return
-
+async def send_content(message: Message, city: str, content: CityData.Content):
     photo_path = content.photo
+    if photo_path:
+        length_limit = 1024
+    else:
+        length_limit = 2048
+
+    pages = content_text_cutter(city, content, length_limit)
+    text = pages[0] # todo: реализовать переход по страницам
+
     # фотографии нет - отправляем просто текст
     if not photo_path:
         await message.answer(text, reply_markup=get_categories_markup())
-        return
-
-    if not os.path.exists(photo_path):
-        await message.answer(texts.messages.photo_not_exists_error)
-        print(f"photo_path = {photo_path} не существует")
-        return
-
-    photo = FSInputFile(photo_path)
-
-    # текст не влезает в подпись - отправим отдельно
-    if len(text) > 1024:
-        await message.answer(text, reply_markup=get_categories_markup())
-        await message.answer_photo(photo=photo, caption=text)
     else:
+        photo = FSInputFile(photo_path)
         await message.answer_photo(photo=photo, caption=text, reply_markup=get_categories_markup())
 
 
@@ -87,7 +74,7 @@ async def city_callback_handler(callback_query: types.CallbackQuery,
 
     # Запоминаем выбранный город,
     state_data.selected_city = city_name
-    await send_content(callback_query.message, city.description, city_name)
+    await send_content(callback_query.message, city_name, city.description)
     await callback_query.answer()
 
 
@@ -127,6 +114,6 @@ async def category_callback_handler(
     if isinstance(content, list):
         content = random.choice(content)
 
-    await send_content(callback_query.message, content, city_name)
+    await send_content(callback_query.message, city_name, content)
 
     await callback_query.answer()

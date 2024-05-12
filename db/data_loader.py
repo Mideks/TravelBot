@@ -38,6 +38,22 @@ def load_all_cities(parent_folder_path: str) -> list[CityData]:
     for city_folder in items_in_parent_folder:
         city_path = os.path.join(parent_folder_path, city_folder)
         city_data = load_city(city_path)
+        check_photos_exists(city_data)
         loaded_cities.append(city_data)
 
     return loaded_cities
+
+
+def check_photos_exists(city_data: CityData):
+    for data in city_data.values():
+        contents = []
+        if isinstance(data, CityData.Content):
+            contents = [data]
+        elif isinstance(data, list) and isinstance(data[0], CityData.Content):
+            contents = data
+
+        for content in contents:
+            photo_path = content.photo
+            if not os.path.exists(photo_path):
+                print(f"photo_path = {photo_path} не существует")
+
