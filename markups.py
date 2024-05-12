@@ -4,6 +4,7 @@ from aiogram.types import InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from callback_data import Category, City, SelectCity, ShowPremiumInfo
+from db.city_data import CityData
 
 
 def get_categories_markup() -> InlineKeyboardMarkup:
@@ -84,14 +85,14 @@ def get_show_premium_markup() -> InlineKeyboardMarkup:
     return builder.as_markup()
 
 
-def get_cities_markup(cities: list) -> InlineKeyboardMarkup:
+def get_cities_markup(cities: list[CityData]) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
     # todo: Возможно, не лучшая идея, если городов было бы много
     # Создаём по кнопке на каждый город
     builder.button(text="🎲 Случайный", callback_data=City(city_name="meow", is_random_city=True))
     for city in cities:
-        builder.button(text=city, callback_data=City(city_name=city))
+        builder.button(text=city.city_name, callback_data=City(city_name=city.city_name))
     builder.adjust(1, 2)
 
     return builder.as_markup()

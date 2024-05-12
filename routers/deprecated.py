@@ -1,8 +1,6 @@
-import os
 import random
 
 from aiogram import Router, types, F
-from aiogram.filters import Command
 from aiogram.types import FSInputFile, Message
 
 import db.data_loader
@@ -21,20 +19,9 @@ cities = db.data_loader.load_all_cities('data/cities')
 
 @router.callback_query(SelectCity.filter())
 async def city_select_callback_handler(callback_query: types.CallbackQuery):
-    await send_select_city_message(callback_query.message)
+    await callback_query.message.answer(
+        texts.messages.selecting_city, reply_markup=get_cities_markup(cities))
     await callback_query.answer()
-
-
-@router.message(Command("city"))
-async def city_select_command_handler(message: types.Message):
-    await send_select_city_message(message)
-
-
-async def send_select_city_message(message: types.Message):
-    text = texts.messages.selecting_city
-    city_names = [city.city_name for city in cities]
-
-    await message.answer(text, reply_markup=get_cities_markup(city_names))
 
 
 @router.callback_query(ShowPremiumInfo.filter())
