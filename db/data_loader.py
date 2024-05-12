@@ -1,12 +1,11 @@
-import json
 import os
 
-from city_data import *
+from db.city_data import *
 
 
 def load_city(city_path: str, city_file_name: str = 'city_data.json') -> CityData:
     # Construct the full path to the city file
-    city_file_path = f"{city_path}/{city_file_name}"
+    city_file_path = path.join(city_path, city_file_name)
 
     with open(city_file_path, 'r', encoding='utf-8') as file:
         data = json.load(file)
@@ -31,7 +30,7 @@ def load_city(city_path: str, city_file_name: str = 'city_data.json') -> CityDat
     return city_data
 
 
-def load_all_cities(parent_folder_path: str) -> list:
+def load_all_cities(parent_folder_path: str) -> list[CityData]:
     loaded_cities = []
 
     items_in_parent_folder = os.listdir(parent_folder_path)

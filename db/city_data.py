@@ -1,8 +1,9 @@
 import json
+from os import path
 from typing import List, Optional
 
 
-class CityData:
+class CityData(dict):
     class Location:
         def __init__(self, latitude: float, longitude: float):
             self.latitude = latitude
@@ -18,7 +19,7 @@ class CityData:
         @property
         def photo(self):
             if self._photo:
-                return self._city_path + self._photo
+                return path.join(self._city_path, self._photo)
             return None
 
         @photo.setter
@@ -56,6 +57,10 @@ class CityData:
             super().__init__(city_path, title, text, photo)
             self.location = location
             self.link = link
+
+    __getattr__ = dict.get
+    __setattr__ = dict.__setitem__
+    __delattr__ = dict.__delitem__
 
     def __init__(self, city_path: str, city_name: str, description: Content, location: Location, history: Content, facts: List[Fact],
                  climate: Content, photo_places: List[PhotoPlace], celebrities: List[Celebrity],
