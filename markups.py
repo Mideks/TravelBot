@@ -1,3 +1,5 @@
+from typing import Optional
+
 from aiogram.types import InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
@@ -31,6 +33,34 @@ def get_categories_markup() -> InlineKeyboardMarkup:
          .adjust(2))
 
     return builder.as_markup()
+
+
+def get_content_markup(
+        navigation: Optional[bool] = False, link: Optional[str] = None,
+        many_content: Optional[bool] = False) -> InlineKeyboardMarkup:
+
+    menu = InlineKeyboardBuilder()
+    adjust = []
+    if navigation:
+        navigate = InlineKeyboardBuilder()
+        navigate.button(text="◀️", callback_data="todo")
+        navigate.button(text="▶️", callback_data="todo")
+        menu.attach(navigate)
+        adjust.append(2)
+
+    if link:
+        menu.button(text="Подробнее", url=link)
+
+    if many_content:
+        other_content = InlineKeyboardBuilder()
+        other_content.button(text="🎲 Показать другое", callback_data="todo")
+        other_content.button(text="📋Показать списком", callback_data="todo")
+        menu.attach(other_content)
+
+    menu.button(text="🔙 Вернуться к городу", callback_data="todo")
+
+    menu.adjust(*adjust, 1)
+    return menu.as_markup()
 
 
 def get_premium_markup() -> InlineKeyboardMarkup:

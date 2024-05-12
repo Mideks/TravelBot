@@ -11,7 +11,7 @@ from callback_data import SelectCity, ShowPremiumInfo, City, Category
 from utils.content import content_text_cutter
 from db.city_data import CityData
 from markups import get_premium_markup, get_cities_markup, get_categories_markup, \
-    get_show_premium_markup
+    get_show_premium_markup, get_content_markup
 from states.state_data import StateData
 
 router = Router()
@@ -54,12 +54,17 @@ async def send_content(message: Message, city: str, content: CityData.Content):
     pages = content_text_cutter(city, content, length_limit)
     text = pages[0] # todo: реализовать переход по страницам
 
+    if isinstance(content, CityData.Description):
+        kb = get_categories_markup()
+    else:
+        kb = get_content_markup()
+
     # фотографии нет - отправляем просто текст
     if not photo_path:
-        await message.answer(text, reply_markup=get_categories_markup())
+        await message.answer(text, reply_markup=kb)
     else:
         photo = FSInputFile(photo_path)
-        await message.answer_photo(photo=photo, caption=text, reply_markup=get_categories_markup())
+        await message.answer_photo(photo=photo, caption=text, reply_markup=kb)
 
 
 @router.callback_query(City.filter())

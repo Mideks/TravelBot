@@ -29,6 +29,15 @@ class CityData(dict):
     class Fact(Content):
         pass
 
+    class Description(Content):
+        pass
+
+    class History(Content):
+        pass
+
+    class Climate(Content):
+        pass
+
     class PhotoPlace(Content):
         def __init__(self, city_path: str, title: str, text: str, photo: str, location: "CityData.Location"):
 
@@ -62,8 +71,8 @@ class CityData(dict):
     __setattr__ = dict.__setitem__
     __delattr__ = dict.__delitem__
 
-    def __init__(self, city_path: str, city_name: str, description: Content, location: Location, history: Content, facts: List[Fact],
-                 climate: Content, photo_places: List[PhotoPlace], celebrities: List[Celebrity],
+    def __init__(self, city_path: str, city_name: str, description: Description, location: Location, history: History, facts: List[Fact],
+                 climate: Climate, photo_places: List[PhotoPlace], celebrities: List[Celebrity],
                  local_cuisine: List[LocalCuisine], nature: List[Nature], legends: List[Legend],
                  local_holidays: List[LocalHoliday], interesting_places: List[InterestingPlace]):
         self._city_path = city_path # Store the city path for use in Content subclasse
