@@ -64,6 +64,26 @@ def get_content_markup(
     return menu.as_markup()
 
 
+def get_content_list_markup(contents: list[CityData.Content],
+                            navigation: Optional[bool] = False) -> InlineKeyboardMarkup:
+    menu = InlineKeyboardBuilder()
+    adjust = []
+    if navigation:
+        navigate = InlineKeyboardBuilder()
+        navigate.button(text="◀️", callback_data="todo")
+        navigate.button(text="▶️", callback_data="todo")
+        menu.attach(navigate)
+        adjust.append(2)
+
+    for content in contents:
+        menu.button(text=content.title, callback_data="todo")
+
+    menu.button(text="🔙 Вернуться к городу", callback_data="todo")
+
+    menu.adjust(*adjust, 1)
+    return menu.as_markup()
+
+
 def get_premium_markup() -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     builder.button(text="Купить", url="https://t.me/TripTellerBot")
