@@ -3,33 +3,47 @@ from typing import Optional
 from aiogram.types import InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from callback_data import Category, City, NavigationButton, NavigationLocation
+from callback_data import CategoryButton, City, NavigationButton, NavigationLocation, Category
 from db.city_data import CityData
 
 
 def get_categories_markup() -> InlineKeyboardMarkup:
     builder = \
         (InlineKeyboardBuilder()
-         .button(text="История", callback_data=Category(category_name="history"))
-         .button(text="🔐 Галерея", callback_data=Category(category_name="", is_locked=True))
+         .button(text="История",
+                 callback_data=CategoryButton(category=Category.History))
+         .button(text="🔐 Галерея",
+                 callback_data=CategoryButton(category=Category.Gallery, is_locked=True))
 
-         .button(text="🎲 Интересные факты", callback_data=Category(category_name="facts"))
-         .button(text="🎲 Места для фото", callback_data=Category(category_name="photo_places"))
+         .button(text="🎲 Интересные факты",
+                 callback_data=CategoryButton(category=Category.InterestingFacts))
+         .button(text="🎲 Места для фото",
+                 callback_data=CategoryButton(category=Category.PhotoPlaces))
 
-         .button(text="🔐 Погода сейчас", callback_data=Category(category_name="", is_locked=True))
-         .button(text="💎 Климат", callback_data=Category(category_name="climate", is_locked=False, is_premium=True))
+         .button(text="🔐 Погода сейчас",
+                 callback_data=CategoryButton(category=Category.WeatherNow, is_locked=True))
+         .button(text="💎 Климат",
+                 callback_data=CategoryButton(category=Category.Climate, is_locked=False, is_premium=True))
 
-         .button(text="🎲 Знаменитости", callback_data=Category(category_name="celebrities", is_locked=False))
-         .button(text="🎲 Местная кухня", callback_data=Category(category_name="local_cuisine", is_locked=False))
+         .button(text="🎲 Знаменитости",
+                 callback_data=CategoryButton(category=Category.Celebrities, is_locked=False))
+         .button(text="🎲 Местная кухня",
+                 callback_data=CategoryButton(category=Category.LocalCuisine, is_locked=False))
 
-         .button(text="Флора и фауна", callback_data=Category(category_name="nature", is_locked=False))
-         .button(text="🎲 Легенды", callback_data=Category(category_name="legends", is_locked=False))
+         .button(text="Флора и фауна",
+                 callback_data=CategoryButton(category=Category.Nature, is_locked=False))
+         .button(text="🎲 Легенды",
+                 callback_data=CategoryButton(category=Category.Legends, is_locked=False))
 
-         .button(text="🎲 Интересные места", callback_data=Category(category_name="interesting_places", is_locked=False))
-         .button(text="🎲 Местные праздники", callback_data=Category(category_name="local_holidays", is_locked=False))
+         .button(text="🎲 Интересные места",
+                 callback_data=CategoryButton(category=Category.InterestingPlaces, is_locked=False))
+         .button(text="🎲 Местные праздники",
+                 callback_data=CategoryButton(category=Category.LocalHolidays, is_locked=False))
 
-         .button(text="🔐 Памятники", callback_data=Category(category_name="monuments", is_locked=True))
-         .button(text="🔐 Достопримечательности", callback_data=Category(category_name="attractions", is_locked=True))
+         .button(text="🔐 Памятники",
+                 callback_data=CategoryButton(category=Category.Monuments, is_locked=True))
+         .button(text="🔐 Достопримечательности",
+                 callback_data=CategoryButton(category=Category.Attractions, is_locked=True))
 
          .adjust(2))
 
@@ -39,7 +53,6 @@ def get_categories_markup() -> InlineKeyboardMarkup:
 def get_content_markup(
         navigation: Optional[bool] = False, link: Optional[str] = None,
         many_content: Optional[bool] = False) -> InlineKeyboardMarkup:
-
     menu = InlineKeyboardBuilder()
     adjust = []
     if navigation:

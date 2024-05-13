@@ -5,7 +5,7 @@ from aiogram.types import FSInputFile, Message
 
 import db.data_loader
 import texts.messages
-from callback_data import City, Category, NavigationButton, NavigationLocation
+from callback_data import City, CategoryButton, NavigationButton, NavigationLocation
 from db.city_data import CityData
 from markups import get_premium_markup, get_cities_markup, get_categories_markup, \
     get_show_premium_markup, get_content_markup
@@ -70,7 +70,7 @@ async def city_callback_handler(callback_query: types.CallbackQuery,
     await callback_query.answer()
 
 
-@router.callback_query(Category.filter(F.is_premium))
+@router.callback_query(CategoryButton.filter(F.is_premium))
 async def premium_only_callback_handler(callback_query: types.CallbackQuery):
     # todo: добавить проверку на премиум у юзера
     text = texts.messages.premium_funtionality
@@ -78,18 +78,18 @@ async def premium_only_callback_handler(callback_query: types.CallbackQuery):
     await callback_query.answer()
 
 
-@router.callback_query(Category.filter(F.is_locked))
+@router.callback_query(CategoryButton.filter(F.is_locked))
 async def locked_callback_handler(callback_query: types.CallbackQuery):
     text = texts.messages.not_implemented_functionality
     await callback_query.message.answer(text)
     await callback_query.answer()
 
 
-@router.callback_query(Category.filter())
+@router.callback_query(CategoryButton.filter())
 async def category_callback_handler(
-        callback_query: types.CallbackQuery, callback_data: Category, state_data: StateData):
+        callback_query: types.CallbackQuery, callback_data: CategoryButton, state_data: StateData):
     # Извлекаем данные из callback_query
-    category = callback_data.category_name
+    category = callback_data.category.value
 
     # Вспоминаем какой город выбрали
     city_name = state_data.selected_city

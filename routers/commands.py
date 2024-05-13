@@ -1,11 +1,10 @@
 from aiogram import Router, types
 from aiogram.filters import CommandStart, Command
-from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
 import texts.messages
 from markups import get_greeting_markup, get_premium_markup, get_cities_markup
-from routers.deprecated import router, cities
+from routers.deprecated import cities
 
 router = Router()
 

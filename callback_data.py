@@ -3,10 +3,27 @@ import enum
 from aiogram.filters.callback_data import CallbackData
 
 
-class Category(CallbackData, prefix="category"):
-    category_name: str
-    is_premium: bool = False
-    is_locked: bool = False
+class Category(enum.Enum):
+    History = "history"
+    Gallery = "gallery"
+    InterestingFacts = "facts"
+    PhotoPlaces = "photo_places"
+    WeatherNow = "weather_now"
+    Climate = "climate"
+    Celebrities = "celebrities"
+    LocalCuisine = "local_cuisine"
+    Nature = "nature"
+    Legends = "legends"
+    InterestingPlaces = "interesting_places"
+    LocalHolidays = "local_holidays"
+    Monuments = "monuments"
+    Attractions = "attractions"
+
+
+class CategoryButton(CallbackData, prefix="category"):
+    category: Category
+    is_locked = False
+    is_premium = False
 
 
 class City(CallbackData, prefix="city"):
