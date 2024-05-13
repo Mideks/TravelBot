@@ -5,7 +5,7 @@ from aiogram.types import FSInputFile, Message
 
 import db.data_loader
 import texts.messages
-from callback_data import City, CategoryButton, NavigationButton, NavigationLocation
+from callback_data import CityButton, CategoryButton, NavigationButton, NavigationLocation
 from db.city_data import CityData
 from markups import get_premium_markup, get_cities_markup, get_categories_markup, \
     get_show_premium_markup, get_content_markup
@@ -44,7 +44,7 @@ async def send_content(message: Message, city: str, content: CityData.Content):
     if isinstance(content, CityData.Description):
         kb = get_categories_markup()
     else:
-        kb = get_content_markup()
+        kb = get_content_markup(many_content=True)
 
     # фотографии нет - отправляем просто текст
     if not photo_path:
@@ -54,18 +54,22 @@ async def send_content(message: Message, city: str, content: CityData.Content):
         await message.answer_photo(photo=photo, caption=text, reply_markup=kb)
 
 
-@router.callback_query(City.filter())
+@router.callback_query(CityButton.filter())
 async def city_callback_handler(callback_query: types.CallbackQuery,
-                                callback_data: City, state_data: StateData):
+                                callback_data: CityButton, state_data: StateData):
     if callback_data.is_random_city:
         city = random.choice(cities)
         city_name = city.city_name
+        state_data.selected_city = city_name
     else:
-        city_name = callback_data.city_name
+        if callback_data.city_name:
+            city_name = callback_data.city_name
+            state_data.selected_city = city_name
+        else:
+            city_name = state_data.selected_city
+
         city = next((obj for obj in cities if obj.city_name == city_name), None)
 
-    # Запоминаем выбранный город,
-    state_data.selected_city = city_name
     await send_content(callback_query.message, city_name, city.description)
     await callback_query.answer()
 
@@ -88,8 +92,15 @@ async def locked_callback_handler(callback_query: types.CallbackQuery):
 @router.callback_query(CategoryButton.filter())
 async def category_callback_handler(
         callback_query: types.CallbackQuery, callback_data: CategoryButton, state_data: StateData):
-    # Извлекаем данные из callback_query
-    category = callback_data.category.value
+    category = None
+    if callback_data.category:
+        category = callback_data.category.value
+        state_data.selected_category = callback_data.category
+    elif state_data.selected_category:
+        category = state_data.selected_category.value
+
+    if not category:
+        raise ValueError('Category does not specified')
 
     # Вспоминаем какой город выбрали
     city_name = state_data.selected_city

@@ -1,4 +1,5 @@
 import enum
+from typing import Optional
 
 from aiogram.filters.callback_data import CallbackData
 
@@ -21,14 +22,14 @@ class Category(enum.Enum):
 
 
 class CategoryButton(CallbackData, prefix="category"):
-    category: Category
-    is_locked = False
-    is_premium = False
+    category: Optional[Category] = None
+    is_locked: Optional[bool] = False
+    is_premium: Optional[bool] = False
 
 
-class City(CallbackData, prefix="city"):
-    city_name: str = None
-    is_random_city: bool = False
+class CityButton(CallbackData, prefix="city"):
+    city_name: Optional[str] = None
+    is_random_city: Optional[bool] = False
 
 
 class NavigationLocation(enum.Enum):

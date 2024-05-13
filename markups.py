@@ -3,7 +3,7 @@ from typing import Optional
 from aiogram.types import InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from callback_data import CategoryButton, City, NavigationButton, NavigationLocation, Category
+from callback_data import CategoryButton, CityButton, NavigationButton, NavigationLocation, Category
 from db.city_data import CityData
 
 
@@ -67,11 +67,11 @@ def get_content_markup(
 
     if many_content:
         other_content = InlineKeyboardBuilder()
-        other_content.button(text="🎲 Показать другое", callback_data="todo")
-        other_content.button(text="📋Показать списком", callback_data="todo")
+        other_content.button(text="🎲 Показать другое", callback_data=CategoryButton())
+        other_content.button(text="📋 Показать списком", callback_data="todo")
         menu.attach(other_content)
 
-    menu.button(text="🔙 Вернуться к городу", callback_data="todo")
+    menu.button(text="🔙 Вернуться к городу", callback_data=CityButton())
 
     menu.adjust(*adjust, 1)
     return menu.as_markup()
@@ -91,7 +91,7 @@ def get_content_list_markup(contents: list[CityData.Content],
     for content in contents:
         menu.button(text=content.title, callback_data="todo")
 
-    menu.button(text="🔙 Вернуться к городу", callback_data="todo")
+    menu.button(text="🔙 Вернуться к городу", callback_data=CityButton())
 
     menu.adjust(*adjust, 1)
     return menu.as_markup()
@@ -124,9 +124,9 @@ def get_cities_markup(cities: list[CityData]) -> InlineKeyboardMarkup:
 
     # todo: Возможно, не лучшая идея, если городов было бы много
     # Создаём по кнопке на каждый город
-    builder.button(text="🎲 Случайный", callback_data=City(city_name="meow", is_random_city=True))
+    builder.button(text="🎲 Случайный", callback_data=CityButton(is_random_city=True))
     for city in cities:
-        builder.button(text=city.city_name, callback_data=City(city_name=city.city_name))
+        builder.button(text=city.city_name, callback_data=CityButton(city_name=city.city_name))
     builder.adjust(1, 2)
 
     return builder.as_markup()
