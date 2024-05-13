@@ -1,3 +1,5 @@
+import enum
+
 from aiogram.filters.callback_data import CallbackData
 
 
@@ -12,9 +14,10 @@ class City(CallbackData, prefix="city"):
     is_random_city: bool = False
 
 
-class SelectCity(CallbackData, prefix="select_city"):
-    pass
+class NavigationLocation(enum.Enum):
+    SelectCity = "SelectCity"
+    ShowPremiumInfo = "ShowPremiumInfo"
 
 
-class ShowPremiumInfo(CallbackData, prefix="show_premium_info"):
-    pass
+class NavigationButton(CallbackData, prefix="navigation"):
+    location: NavigationLocation

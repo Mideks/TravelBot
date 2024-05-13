@@ -5,26 +5,26 @@ from aiogram.types import FSInputFile, Message
 
 import db.data_loader
 import texts.messages
-from callback_data import SelectCity, ShowPremiumInfo, City, Category
-from utils.content import content_text_cutter
+from callback_data import City, Category, NavigationButton, NavigationLocation
 from db.city_data import CityData
 from markups import get_premium_markup, get_cities_markup, get_categories_markup, \
     get_show_premium_markup, get_content_markup
 from states.state_data import StateData
+from utils.content import content_text_cutter
 
 router = Router()
 
 cities = db.data_loader.load_all_cities('data/cities')
 
 
-@router.callback_query(SelectCity.filter())
+@router.callback_query(NavigationButton.filter(F.location == NavigationLocation.SelectCity))
 async def city_select_callback_handler(callback_query: types.CallbackQuery):
     await callback_query.message.answer(
         texts.messages.selecting_city, reply_markup=get_cities_markup(cities))
     await callback_query.answer()
 
 
-@router.callback_query(ShowPremiumInfo.filter())
+@router.callback_query(NavigationButton.filter(F.location == NavigationLocation.ShowPremiumInfo))
 async def show_premium_callback_handler(callback_query: types.CallbackQuery):
     await callback_query.message.answer(texts.messages.premium_info, reply_markup=get_premium_markup())
     await callback_query.answer()

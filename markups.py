@@ -3,7 +3,7 @@ from typing import Optional
 from aiogram.types import InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from callback_data import Category, City, SelectCity, ShowPremiumInfo
+from callback_data import Category, City, NavigationButton, NavigationLocation
 from db.city_data import CityData
 
 
@@ -93,14 +93,15 @@ def get_premium_markup() -> InlineKeyboardMarkup:
 
 def get_greeting_markup() -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
-    builder.button(text="Поехали!", callback_data=SelectCity())
+    builder.button(text="Поехали!", callback_data=NavigationButton(location=NavigationLocation.SelectCity))
 
     return builder.as_markup()
 
 
 def get_show_premium_markup() -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
-    builder.button(text="💎 Узнать подробности!", callback_data=ShowPremiumInfo())
+    builder.button(text="💎 Узнать подробности!",
+                   callback_data=NavigationButton(location=NavigationLocation.ShowPremiumInfo))
 
     return builder.as_markup()
 
