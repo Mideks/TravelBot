@@ -3,7 +3,8 @@ from typing import Optional
 from aiogram.types import InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from callback_data import CategoryButton, CityButton, NavigationButton, NavigationLocation, Category
+import texts
+from callback_data import CategoryButton, CityButton, NavigationButton, NavigationLocation, Category, LockableButton
 from db.city_data import CityData
 
 
@@ -45,6 +46,9 @@ def get_categories_markup() -> InlineKeyboardMarkup:
          .button(text="🔐 Достопримечательности",
                  callback_data=CategoryButton(category=Category.Attractions, is_locked=True))
 
+         .button(text=texts.buttons.back_to_menu,
+                 callback_data=NavigationButton(location=NavigationLocation.Menu))
+
          .adjust(2))
 
     return builder.as_markup()
@@ -71,7 +75,7 @@ def get_content_markup(
         other_content.button(text="📋 Показать списком", callback_data="todo")
         menu.attach(other_content)
 
-    menu.button(text="🔙 Вернуться к городу", callback_data=CityButton())
+    menu.button(text=texts.buttons.back_to_city, callback_data=CityButton())
 
     menu.adjust(*adjust, 1)
     return menu.as_markup()
@@ -91,30 +95,47 @@ def get_content_list_markup(contents: list[CityData.Content],
     for content in contents:
         menu.button(text=content.title, callback_data="todo")
 
-    menu.button(text="🔙 Вернуться к городу", callback_data=CityButton())
+    menu.button(text=texts.buttons.back_to_city, callback_data=CityButton())
 
     menu.adjust(*adjust, 1)
     return menu.as_markup()
 
 
-def get_premium_markup() -> InlineKeyboardMarkup:
+def get_premium_markup(back: NavigationLocation) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     builder.button(text="Купить", url="https://t.me/TripTellerBot")
+    builder.button(text=texts.buttons.back, callback_data=NavigationButton(location=back))
 
+    builder.adjust(1)
     return builder.as_markup()
 
 
 def get_greeting_markup() -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
-    builder.button(text="Поехали!", callback_data=NavigationButton(location=NavigationLocation.SelectCity))
+    builder.button(text=texts.buttons.start_joinery,
+                   callback_data=NavigationButton(location=NavigationLocation.Menu))
 
     return builder.as_markup()
 
 
+def get_menu_markup() -> InlineKeyboardMarkup:
+    kb = InlineKeyboardBuilder()
+
+    kb.button(text=texts.buttons.city_list, callback_data=NavigationButton(location=NavigationLocation.CityList))
+    kb.button(text=texts.buttons.random_city, callback_data=CityButton(is_random_city=True))
+    kb.button(text=texts.buttons.my_gallery, callback_data=LockableButton(is_locked=True))
+    kb.button(text=texts.buttons.premium, callback_data=NavigationButton(location=NavigationLocation.PremiumInfo))
+    kb.button(text=texts.buttons.settings, callback_data=NavigationButton(location=NavigationLocation.Settings))
+
+    kb.adjust(2, 1)
+    return kb.as_markup()
+
+
 def get_show_premium_markup() -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
-    builder.button(text="💎 Узнать подробности!",
-                   callback_data=NavigationButton(location=NavigationLocation.ShowPremiumInfo))
+    builder.button(text=texts.buttons.premium_more_info,
+                   callback_data=NavigationButton(location=NavigationLocation.PremiumInfo))
+    builder.button(text=texts.buttons.back_to_city, callback_data=CityButton())
 
     return builder.as_markup()
 
@@ -124,7 +145,7 @@ def get_cities_markup(cities: list[CityData]) -> InlineKeyboardMarkup:
 
     # todo: Возможно, не лучшая идея, если городов было бы много
     # Создаём по кнопке на каждый город
-    builder.button(text="🎲 Случайный", callback_data=CityButton(is_random_city=True))
+    builder.button(text=texts.buttons.random_city, callback_data=CityButton(is_random_city=True))
     for city in cities:
         builder.button(text=city.city_name, callback_data=CityButton(city_name=city.city_name))
     builder.adjust(1, 2)

@@ -22,24 +22,20 @@ async def command_start_handler(message: Message) -> None:
     await send_helper(message, texts.messages.start, get_greeting_markup(), send_as_new=True)
 
 
-@router.callback_query(NavigationButton.filter(F.location == NavigationLocation.ShowPremiumInfo))
+@router.callback_query(NavigationButton.filter(F.location == NavigationLocation.PremiumInfo))
 async def show_premium_callback(callback_query: types.CallbackQuery):
-    await send_helper(callback_query.message, texts.messages.premium_info, get_premium_markup())
+    back = NavigationLocation.Menu
+    await send_helper(callback_query.message, texts.messages.premium_info, get_premium_markup(back))
     await callback_query.answer()
 
 
 @router.message(Command("premium"))
 async def premium_command_handler(message: types.Message):
-    await send_helper(message, texts.messages.premium_info, get_premium_markup(), send_as_new=True)
+    back = NavigationLocation.Menu
+    await send_helper(message, texts.messages.premium_info, get_premium_markup(back), send_as_new=True)
 
 
-@router.callback_query(NavigationButton.filter(F.location == NavigationLocation.ShowPremiumInfo))
-async def show_premium_callback(callback_query: types.CallbackQuery):
-    await send_helper(callback_query.message, texts.messages.premium_info, get_premium_markup())
-    await callback_query.answer()
-
-
-@router.callback_query(NavigationButton.filter(F.location == NavigationLocation.SelectCity))
+@router.callback_query(NavigationButton.filter(F.location == NavigationLocation.CityList))
 async def city_select_callback(callback_query: types.CallbackQuery):
     await send_helper(callback_query.message, texts.messages.selecting_city, get_cities_markup(cities))
     await callback_query.answer()

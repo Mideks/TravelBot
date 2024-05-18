@@ -21,9 +21,12 @@ class Category(enum.Enum):
     Attractions = "attractions"
 
 
-class CategoryButton(CallbackData, prefix="category"):
-    category: Optional[Category] = None
+class LockableButton(CallbackData, prefix="lockable"):
     is_locked: Optional[bool] = False
+
+
+class CategoryButton(LockableButton, prefix="category"):
+    category: Optional[Category] = None
     is_premium: Optional[bool] = False
 
 
@@ -33,9 +36,11 @@ class CityButton(CallbackData, prefix="city"):
 
 
 class NavigationLocation(enum.Enum):
-    SelectCity = "SelectCity"
-    ShowPremiumInfo = "ShowPremiumInfo"
+    Settings = "Settings"
+    CityList = "CityList"
+    PremiumInfo = "PremiumInfo"
     Start = "Start"
+    Menu = "Menu"
 
 
 class NavigationButton(CallbackData, prefix="navigation"):
