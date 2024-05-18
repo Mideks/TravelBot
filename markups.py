@@ -6,44 +6,48 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 import texts
 from callback_data import CategoryButton, CityButton, NavigationButton, NavigationLocation, Category, LockableButton
 from db.city_data import CityData
+from texts.buttons import history_category, gallery_category, interesting_facts_category, photo_places_category, \
+    weather_category, climate_category, celebrities_category, local_eat_category, nature_category, legends_category, \
+    interesting_places_category, local_holidays_category, monuments_category, attractions_category, prev_page, \
+    next_page, buy_premium, show_other_content, show_content_list, category_more_info_link
 
 
 def get_categories_markup() -> InlineKeyboardMarkup:
     builder = \
         (InlineKeyboardBuilder()
-         .button(text="История",
+         .button(text=history_category,
                  callback_data=CategoryButton(category=Category.History))
-         .button(text="🔐 Галерея",
+         .button(text=gallery_category,
                  callback_data=CategoryButton(category=Category.Gallery, is_locked=True))
 
-         .button(text="🎲 Интересные факты",
+         .button(text=interesting_facts_category,
                  callback_data=CategoryButton(category=Category.InterestingFacts))
-         .button(text="🎲 Места для фото",
+         .button(text=photo_places_category,
                  callback_data=CategoryButton(category=Category.PhotoPlaces))
 
-         .button(text="🔐 Погода сейчас",
+         .button(text=weather_category,
                  callback_data=CategoryButton(category=Category.WeatherNow, is_locked=True))
-         .button(text="💎 Климат",
+         .button(text=climate_category,
                  callback_data=CategoryButton(category=Category.Climate, is_locked=False, is_premium=True))
 
-         .button(text="🎲 Знаменитости",
+         .button(text=celebrities_category,
                  callback_data=CategoryButton(category=Category.Celebrities, is_locked=False))
-         .button(text="🎲 Местная кухня",
+         .button(text=local_eat_category,
                  callback_data=CategoryButton(category=Category.LocalCuisine, is_locked=False))
 
-         .button(text="Флора и фауна",
+         .button(text=nature_category,
                  callback_data=CategoryButton(category=Category.Nature, is_locked=False))
-         .button(text="🎲 Легенды",
+         .button(text=legends_category,
                  callback_data=CategoryButton(category=Category.Legends, is_locked=False))
 
-         .button(text="🎲 Интересные места",
+         .button(text=interesting_places_category,
                  callback_data=CategoryButton(category=Category.InterestingPlaces, is_locked=False))
-         .button(text="🎲 Местные праздники",
+         .button(text=local_holidays_category,
                  callback_data=CategoryButton(category=Category.LocalHolidays, is_locked=False))
 
-         .button(text="🔐 Памятники",
+         .button(text=monuments_category,
                  callback_data=CategoryButton(category=Category.Monuments, is_locked=True))
-         .button(text="🔐 Достопримечательности",
+         .button(text=attractions_category,
                  callback_data=CategoryButton(category=Category.Attractions, is_locked=True))
 
          .button(text=texts.buttons.back_to_menu,
@@ -61,18 +65,18 @@ def get_content_markup(
     adjust = []
     if navigation:
         navigate = InlineKeyboardBuilder()
-        navigate.button(text="◀️", callback_data="todo")
-        navigate.button(text="▶️", callback_data="todo")
+        navigate.button(text=prev_page, callback_data="todo")
+        navigate.button(text=next_page, callback_data="todo")
         menu.attach(navigate)
         adjust.append(2)
 
     if link:
-        menu.button(text="Подробнее", url=link)
+        menu.button(text=category_more_info_link, url=link)
 
     if many_content:
         other_content = InlineKeyboardBuilder()
-        other_content.button(text="🎲 Показать другое", callback_data=CategoryButton())
-        other_content.button(text="📋 Показать списком", callback_data="todo")
+        other_content.button(text=show_other_content, callback_data=CategoryButton())
+        other_content.button(text=show_content_list, callback_data="todo")
         menu.attach(other_content)
 
     menu.button(text=texts.buttons.back_to_city, callback_data=CityButton())
@@ -87,8 +91,8 @@ def get_content_list_markup(contents: list[CityData.Content],
     adjust = []
     if navigation:
         navigate = InlineKeyboardBuilder()
-        navigate.button(text="◀️", callback_data="todo")
-        navigate.button(text="▶️", callback_data="todo")
+        navigate.button(text=prev_page, callback_data="todo")
+        navigate.button(text=next_page, callback_data="todo")
         menu.attach(navigate)
         adjust.append(2)
 
@@ -103,7 +107,8 @@ def get_content_list_markup(contents: list[CityData.Content],
 
 def get_premium_markup(back: NavigationLocation) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
-    builder.button(text="Купить", url="https://t.me/TripTellerBot")
+    url = "https://t.me/TripTellerBot"
+    builder.button(text=buy_premium, url=url)
     builder.button(text=texts.buttons.back, callback_data=NavigationButton(location=back))
 
     builder.adjust(1)
