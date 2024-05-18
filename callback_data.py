@@ -35,6 +35,7 @@ class CityButton(CallbackData, prefix="city"):
 class NavigationLocation(enum.Enum):
     SelectCity = "SelectCity"
     ShowPremiumInfo = "ShowPremiumInfo"
+    Start = "Start"
 
 
 class NavigationButton(CallbackData, prefix="navigation"):

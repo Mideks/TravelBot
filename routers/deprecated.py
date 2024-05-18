@@ -1,57 +1,17 @@
 import random
 
 from aiogram import Router, types, F
-from aiogram.types import FSInputFile, Message
 
 import db.data_loader
 import texts.messages
-from callback_data import CityButton, CategoryButton, NavigationButton, NavigationLocation
-from db.city_data import CityData
-from markups import get_premium_markup, get_cities_markup, get_categories_markup, \
-    get_show_premium_markup, get_content_markup
+from callback_data import CityButton, CategoryButton
+from markups import get_show_premium_markup
+from message_sending import send_content
 from states.state_data import StateData
-from utils.content import content_text_cutter
 
 router = Router()
 
 cities = db.data_loader.load_all_cities('data/cities')
-
-
-@router.callback_query(NavigationButton.filter(F.location == NavigationLocation.SelectCity))
-async def city_select_callback_handler(callback_query: types.CallbackQuery):
-    await callback_query.message.answer(
-        texts.messages.selecting_city, reply_markup=get_cities_markup(cities))
-    await callback_query.answer()
-
-
-@router.callback_query(NavigationButton.filter(F.location == NavigationLocation.ShowPremiumInfo))
-async def show_premium_callback_handler(callback_query: types.CallbackQuery):
-    await callback_query.message.answer(texts.messages.premium_info, reply_markup=get_premium_markup())
-    await callback_query.answer()
-
-
-# todo: переработать: разные категории -- разный интерфейс
-async def send_content(message: Message, city: str, content: CityData.Content):
-    photo_path = content.photo
-    if photo_path:
-        length_limit = 1024
-    else:
-        length_limit = 2048
-
-    pages = content_text_cutter(city, content, length_limit)
-    text = pages[0] # todo: реализовать переход по страницам
-
-    if isinstance(content, CityData.Description):
-        kb = get_categories_markup()
-    else:
-        kb = get_content_markup(many_content=True)
-
-    # фотографии нет - отправляем просто текст
-    if not photo_path:
-        await message.answer(text, reply_markup=kb)
-    else:
-        photo = FSInputFile(photo_path)
-        await message.answer_photo(photo=photo, caption=text, reply_markup=kb)
 
 
 @router.callback_query(CityButton.filter())
@@ -77,16 +37,14 @@ async def city_callback_handler(callback_query: types.CallbackQuery,
 @router.callback_query(CategoryButton.filter(F.is_premium))
 async def premium_only_callback_handler(callback_query: types.CallbackQuery):
     # todo: добавить проверку на премиум у юзера
-    text = texts.messages.premium_funtionality
-    await callback_query.message.answer(text, reply_markup=get_show_premium_markup())
+    await callback_query.message.edit_text(
+        texts.messages.premium_funtionality, reply_markup=get_show_premium_markup())
     await callback_query.answer()
 
 
 @router.callback_query(CategoryButton.filter(F.is_locked))
 async def locked_callback_handler(callback_query: types.CallbackQuery):
-    text = texts.messages.not_implemented_functionality
-    await callback_query.message.answer(text)
-    await callback_query.answer()
+    await callback_query.answer(texts.messages.not_implemented_functionality)
 
 
 @router.callback_query(CategoryButton.filter())
@@ -107,9 +65,7 @@ async def category_callback_handler(
 
     # Заглушка на случай, если кнопка нажата после перезапуска бота
     if not city_name:
-        text = texts.messages.city_selecting_error
-        await callback_query.message.answer(text)
-        await callback_query.answer()
+        await callback_query.answer(texts.messages.city_selecting_error)
         return
 
     city = next((obj for obj in cities if obj.city_name == city_name), None)
@@ -118,5 +74,4 @@ async def category_callback_handler(
         content = random.choice(content)
 
     await send_content(callback_query.message, city_name, content)
-
     await callback_query.answer()
