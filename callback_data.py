@@ -29,6 +29,7 @@ class CategoryButton(LockableButton, prefix="category"):
     category: Optional[Category] = None
     content_index: Optional[int] = None
     is_premium: Optional[bool] = False
+    is_locked: Optional[bool] = False
 
 
 class CityButton(CallbackData, prefix="city"):

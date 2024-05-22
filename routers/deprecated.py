@@ -51,7 +51,7 @@ async def premium_only_callback_handler(callback_query: types.CallbackQuery):
 
 
 @router.callback_query(CategoryButton.filter(F.is_locked))
-@router.callback_query(LockableButton.filter())
+@router.callback_query(LockableButton.filter(F.is_locked))
 async def locked_callback_handler(callback_query: types.CallbackQuery):
     await callback_query.answer(texts.messages.not_implemented_functionality)
 

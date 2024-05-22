@@ -4,6 +4,7 @@ my_gallery = "🖼️ Моя галерея"
 settings = "⚙️ Настройки"
 premium = "💎 Премиум"
 random_city = "🎲 Случайный город"
+location = "🌎 Местоположение"
 
 # other
 start_joinery = "Поехали!"
@@ -37,7 +38,7 @@ attractions_category = "🔐 Достопримечательности"
 show_other_content = "🎲 Показать другое"
 show_random = "🎲 Случайный"
 show_content_list = "📋 Показать списком"
-category_more_info_link = "Подробнее"
+category_more_info_link = "❓ Подробнее"
 
 # settings
 settings_language = "🌍 Язык"

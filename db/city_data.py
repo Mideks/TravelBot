@@ -1,10 +1,11 @@
-import json
 from os import path
 from typing import List, Optional
 
 
 class CityData(dict):
     class Location:
+        latitude: float
+        longitude: float
         def __init__(self, latitude: float, longitude: float):
             self.latitude = latitude
             self.longitude = longitude
@@ -62,8 +63,9 @@ class CityData(dict):
         pass
 
     class InterestingPlace(Content):
-        def __init__(self, city_path: str, title: str, text: str, photo: str, location: "CityData.Location", link: str):
+        def __init__(self, city_path: str, title: str, text: str, photo: str, location: dict, link: str):
             super().__init__(city_path, title, text, photo)
+            location = CityData.Location(location.get("latitude"), location.get("longitude"))
             self.location = location
             self.link = link
 

@@ -60,7 +60,7 @@ def get_categories_markup() -> InlineKeyboardMarkup:
 
 def get_content_markup(
         navigation: Optional[bool] = False, link: Optional[str] = None,
-        many_content: Optional[bool] = False) -> InlineKeyboardMarkup:
+        many_content: Optional[bool] = False, location: Optional[CityData.Location] = None) -> InlineKeyboardMarkup:
     menu = InlineKeyboardBuilder()
     adjust = []
     if navigation:
@@ -72,6 +72,9 @@ def get_content_markup(
 
     if link:
         menu.button(text=category_more_info_link, url=link)
+    if location:
+        location_link = f"https://yandex.ru/maps/?ll={location.longitude},{location.latitude}"
+        menu.button(text=texts.buttons.location, url=location_link)
 
     if many_content:
         other_content = InlineKeyboardBuilder()

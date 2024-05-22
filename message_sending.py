@@ -22,7 +22,18 @@ async def send_content(message: Message, city: str, content: CityData.Content, s
     if isinstance(content, CityData.Description):
         kb = get_categories_markup()
     else:
-        kb = get_content_markup(many_content=True)
+        many_content = False
+        link = None
+        location = None
+        if isinstance(content, list):
+            many_content = True
+        if isinstance(content, CityData.Celebrity) or isinstance(content, CityData.InterestingPlace):
+            link = content.link
+        if isinstance(content, CityData.InterestingPlace):
+            location = content.location
+
+        kb = get_content_markup(many_content=many_content, link=link, location=location)
+
 
     # фотографии нет - отправляем просто текст
     if not photo_path:
