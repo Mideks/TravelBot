@@ -153,9 +153,11 @@ def get_cities_markup(cities: list[CityData]) -> InlineKeyboardMarkup:
     # todo: Возможно, не лучшая идея, если городов было бы много
     # Создаём по кнопке на каждый город
     builder.button(text=texts.buttons.random_city, callback_data=CityButton(is_random_city=True))
-    for city in cities:
-        builder.button(text=city.city_name, callback_data=CityButton(city_name=city.city_name))
-    builder.adjust(1, 2)
+    for i, city in enumerate(cities, 1):
+        builder.button(text=f"{i}. {city.city_name}", callback_data=CityButton(city_name=city.city_name))
+    builder.button(text=texts.buttons.back_to_menu,
+                   callback_data=NavigationButton(location=NavigationLocation.Menu))
+    builder.adjust(1)
 
     return builder.as_markup()
 
