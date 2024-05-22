@@ -1,12 +1,17 @@
+from __future__ import annotations
+
 import random
+from typing import Optional
 
 from aiogram import Router, types, F
 
 import db.data_loader
+import markups
 import texts.messages
-from callback_data import CityButton, CategoryButton
+from callback_data import CityButton, CategoryButton, NavigationButton, NavigationLocation
+from db.city_data import CityData
 from markups import get_show_premium_markup
-from message_sending import send_content
+from message_sending import send_content, send_helper
 from states.state_data import StateData
 
 router = Router()
@@ -30,6 +35,9 @@ async def city_callback_handler(callback_query: types.CallbackQuery,
 
         city = next((obj for obj in cities if obj.city_name == city_name), None)
 
+    if not city:
+        await callback_query.answer(texts.messages.city_selecting_error)
+
     await send_content(callback_query.message, city_name, city.description)
     await callback_query.answer()
 
@@ -50,14 +58,15 @@ async def locked_callback_handler(callback_query: types.CallbackQuery):
 @router.callback_query(CategoryButton.filter())
 async def category_callback_handler(
         callback_query: types.CallbackQuery, callback_data: CategoryButton, state_data: StateData):
-    category = None
+    cat: Optional[str] = None
     if callback_data.category:
-        category = callback_data.category.value
+        cat = callback_data.category.value
         state_data.selected_category = callback_data.category
     elif state_data.selected_category:
-        category = state_data.selected_category.value
+        cat = state_data.selected_category.value
 
-    if not category:
+    if not cat:
+        await callback_query.answer(texts.messages.content_category_error)
         raise ValueError('Category does not specified')
 
     # Вспоминаем какой город выбрали
@@ -68,10 +77,35 @@ async def category_callback_handler(
         await callback_query.answer(texts.messages.city_selecting_error)
         return
 
-    city = next((obj for obj in cities if obj.city_name == city_name), None)
-    content = city[category]
+    content = get_content_category(city_name, cat)
     if isinstance(content, list):
-        content = random.choice(content)
+        if callback_data.content_index:
+            content = content[callback_data.content_index]
+        else:
+            content = random.choice(content)
 
     await send_content(callback_query.message, city_name, content)
     await callback_query.answer()
+
+
+def get_content_category(city_name: str, category: str) -> list[CityData.Content] | CityData.Content:
+    city = next((obj for obj in cities if obj.city_name == city_name), None)
+    content = city[category]
+    return content
+
+
+@router.callback_query(NavigationButton.filter(F.location == NavigationLocation.ContentList))
+async def send_content_list_handler(
+        callback_query: types.CallbackQuery, state_data: StateData):
+    category = state_data.selected_category
+    city_name = state_data.selected_city
+    if not category:
+        await callback_query.answer(texts.messages.content_category_error)
+        return
+    elif not city_name:
+        await callback_query.answer(texts.messages.city_selecting_error)
+        return
+
+    contents = get_content_category(city_name, category.value)
+    await send_helper(callback_query.message, texts.messages.send_content_list,
+                      markups.get_content_list_markup(contents))

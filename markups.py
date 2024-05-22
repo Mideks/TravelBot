@@ -76,7 +76,8 @@ def get_content_markup(
     if many_content:
         other_content = InlineKeyboardBuilder()
         other_content.button(text=show_other_content, callback_data=CategoryButton())
-        other_content.button(text=show_content_list, callback_data="todo")
+        other_content.button(text=show_content_list,
+                             callback_data=NavigationButton(location=NavigationLocation.ContentList))
         menu.attach(other_content)
 
     menu.button(text=texts.buttons.back_to_city, callback_data=CityButton())
@@ -96,8 +97,9 @@ def get_content_list_markup(contents: list[CityData.Content],
         menu.attach(navigate)
         adjust.append(2)
 
-    for content in contents:
-        menu.button(text=content.title, callback_data="todo")
+    menu.button(text=texts.buttons.show_random, callback_data=CategoryButton())
+    for i, content in enumerate(contents):
+        menu.button(text=content.title, callback_data=CategoryButton(content_index=i))
 
     menu.button(text=texts.buttons.back_to_city, callback_data=CityButton())
 

@@ -27,6 +27,7 @@ class LockableButton(CallbackData, prefix="lockable"):
 
 class CategoryButton(LockableButton, prefix="category"):
     category: Optional[Category] = None
+    content_index: Optional[int] = None
     is_premium: Optional[bool] = False
 
 
@@ -41,7 +42,7 @@ class NavigationLocation(enum.Enum):
     PremiumInfo = "PremiumInfo"
     Start = "Start"
     Menu = "Menu"
-
+    ContentList = "ContentList"
 
 class NavigationButton(CallbackData, prefix="navigation"):
     location: NavigationLocation
