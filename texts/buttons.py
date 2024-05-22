@@ -38,3 +38,6 @@ show_other_content = "🎲 Показать другое"
 show_random = "🎲 Случайный"
 show_content_list = "📋 Показать списком"
 category_more_info_link = "Подробнее"
+
+# settings
+settings_language = "🌍 Язык"

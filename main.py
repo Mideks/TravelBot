@@ -19,7 +19,6 @@ bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 async def main() -> None:
     dp.update.middleware(StateDataProvider())
     dp.include_router(routers.commands.router)
-    dp.include_router(routers.menu.router)
     dp.include_router(routers.deprecated.router)
     await dp.start_polling(bot)
 

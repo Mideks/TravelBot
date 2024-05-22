@@ -2,6 +2,7 @@ from aiogram import Router, types, F
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message
 
+import markups
 import texts.messages
 from callback_data import NavigationButton, NavigationLocation
 from markups import get_greeting_markup, get_premium_markup, get_cities_markup
@@ -44,3 +45,25 @@ async def city_select_callback(callback_query: types.CallbackQuery):
 @router.message(Command("city"))
 async def city_select_command_handler(message: types.Message):
     await send_helper(message, texts.messages.selecting_city, get_cities_markup(cities), send_as_new=True)
+
+
+@router.callback_query(NavigationButton.filter(F.location == NavigationLocation.Settings))
+async def settings_callback(callback_query: types.CallbackQuery):
+    await send_helper(callback_query.message, texts.messages.settings, markups.get_settings_markup().as_markup())
+    await callback_query.answer()
+
+
+@router.message(Command("settings"))
+async def settings_command_handler(message: types.Message):
+    await send_helper(message, texts.messages.settings, markups.get_settings_markup().as_markup(), send_as_new=True)
+
+
+@router.callback_query(NavigationButton.filter(F.location == NavigationLocation.Menu))
+async def menu_callback(callback_query: types.CallbackQuery):
+    await send_helper(callback_query.message, texts.messages.menu, markups.get_menu_markup())
+    await callback_query.answer()
+
+
+@router.message(Command("menu"))
+async def menu_command_handler(message: types.Message):
+    await send_helper(message, texts.messages.menu, markups.get_menu_markup())

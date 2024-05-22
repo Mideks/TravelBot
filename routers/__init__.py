@@ -1,1 +1,1 @@
-from . import commands, deprecated, menu
+from . import commands, deprecated

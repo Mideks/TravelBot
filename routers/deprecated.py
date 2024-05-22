@@ -8,7 +8,7 @@ from aiogram import Router, types, F
 import db.data_loader
 import markups
 import texts.messages
-from callback_data import CityButton, CategoryButton, NavigationButton, NavigationLocation
+from callback_data import CityButton, CategoryButton, NavigationButton, NavigationLocation, LockableButton
 from db.city_data import CityData
 from markups import get_show_premium_markup
 from message_sending import send_content, send_helper
@@ -51,6 +51,7 @@ async def premium_only_callback_handler(callback_query: types.CallbackQuery):
 
 
 @router.callback_query(CategoryButton.filter(F.is_locked))
+@router.callback_query(LockableButton.filter())
 async def locked_callback_handler(callback_query: types.CallbackQuery):
     await callback_query.answer(texts.messages.not_implemented_functionality)
 

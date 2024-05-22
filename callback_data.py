@@ -22,7 +22,7 @@ class Category(enum.Enum):
 
 
 class LockableButton(CallbackData, prefix="lockable"):
-    is_locked: Optional[bool] = False
+    is_locked: Optional[bool] = True
 
 
 class CategoryButton(LockableButton, prefix="category"):

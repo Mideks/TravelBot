@@ -158,3 +158,12 @@ def get_cities_markup(cities: list[CityData]) -> InlineKeyboardMarkup:
     builder.adjust(1, 2)
 
     return builder.as_markup()
+
+
+def get_settings_markup() -> InlineKeyboardBuilder:
+    kb = InlineKeyboardBuilder()
+    kb.button(text=texts.buttons.settings_language, callback_data=LockableButton())
+    kb.button(text=texts.buttons.back_to_menu,
+              callback_data=NavigationButton(location=NavigationLocation.Menu))
+    kb.adjust(1)
+    return kb
