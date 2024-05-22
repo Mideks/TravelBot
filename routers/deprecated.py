@@ -38,7 +38,7 @@ async def city_callback_handler(callback_query: types.CallbackQuery,
     if not city:
         await callback_query.answer(texts.messages.city_selecting_error)
 
-    await send_content(callback_query.message, city_name, city.description)
+    await send_content(callback_query.message, city_name, city.description, state_data)
     await callback_query.answer()
 
 
@@ -85,7 +85,7 @@ async def category_callback_handler(
         else:
             content = random.choice(content)
 
-    await send_content(callback_query.message, city_name, content)
+    await send_content(callback_query.message, city_name, content, state_data)
     await callback_query.answer()
 
 
@@ -108,5 +108,5 @@ async def send_content_list_handler(
         return
 
     contents = get_content_category(city_name, category.value)
-    await send_helper(callback_query.message, texts.messages.send_content_list,
+    await send_helper(callback_query.message, texts.messages.send_content_list, state_data,
                       markups.get_content_list_markup(contents))

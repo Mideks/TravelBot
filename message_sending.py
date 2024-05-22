@@ -4,11 +4,12 @@ from aiogram.types import Message, FSInputFile, InlineKeyboardMarkup, InputFile,
 
 from db.city_data import CityData
 from markups import get_categories_markup, get_content_markup
+from states.state_data import StateData
 from utils.content import content_text_cutter
 
 
 # todo: переработать: разные категории -- разный интерфейс
-async def send_content(message: Message, city: str, content: CityData.Content):
+async def send_content(message: Message, city: str, content: CityData.Content, state_data: StateData):
     photo_path = content.photo
     if photo_path:
         length_limit = 1024
@@ -25,13 +26,14 @@ async def send_content(message: Message, city: str, content: CityData.Content):
 
     # фотографии нет - отправляем просто текст
     if not photo_path:
-        await send_helper(message, text, kb)
+        await send_helper(message, text, state_data, kb)
     else:
         photo = FSInputFile(photo_path)
-        await send_helper(message, text, kb, photo)
+        await send_helper(message, text, state_data, kb, photo)
 
 
-async def send_helper(message: Message, send_text: str, markup: Optional[InlineKeyboardMarkup] = None,
+async def send_helper(message: Message, send_text: str, state_data: StateData,
+                      markup: Optional[InlineKeyboardMarkup] = None,
                       photo: Optional[InputFile] = None, send_as_new: Optional[bool] = False):
     new_message = None
 
@@ -48,4 +50,6 @@ async def send_helper(message: Message, send_text: str, markup: Optional[InlineK
             await message.edit_text(send_text, reply_markup=markup)
 
     if new_message:
-        await message.delete()
+        if state_data.bot_message:
+            await state_data.bot_message.delete()
+        state_data.bot_message = new_message
