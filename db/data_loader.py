@@ -1,3 +1,4 @@
+import json
 import os
 
 from db.city_data import *
@@ -49,11 +50,11 @@ def check_photos_exists(city_data: CityData):
         contents = []
         if isinstance(data, CityData.Content):
             contents = [data]
-        elif isinstance(data, list) and isinstance(data[0], CityData.Content):
+        elif isinstance(data, list) and len(data) != 0 and isinstance(data[0], CityData.Content):
             contents = data
 
         for content in contents:
             photo_path = content.photo
-            if not os.path.exists(photo_path):
+            if photo_path and not os.path.exists(photo_path):
                 print(f"photo_path = {photo_path} не существует")
 

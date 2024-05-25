@@ -9,7 +9,8 @@ from utils.content import content_text_cutter
 
 
 # todo: переработать: разные категории -- разный интерфейс
-async def send_content(message: Message, city: str, content: CityData.Content, state_data: StateData):
+async def send_content(message: Message, city: str, content: CityData.Content, state_data: StateData,
+                       many_content: bool = False):
     photo_path = content.photo
     if photo_path:
         length_limit = 1024
@@ -22,11 +23,8 @@ async def send_content(message: Message, city: str, content: CityData.Content, s
     if isinstance(content, CityData.Description):
         kb = get_categories_markup()
     else:
-        many_content = False
         link = None
         location = None
-        if isinstance(content, list):
-            many_content = True
         if isinstance(content, CityData.Celebrity) or isinstance(content, CityData.InterestingPlace):
             link = content.link
         if isinstance(content, CityData.InterestingPlace):

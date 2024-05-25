@@ -79,13 +79,14 @@ async def category_callback_handler(
         return
 
     content = get_content_category(city_name, cat)
+    many_content = len(content) > 0
     if isinstance(content, list):
         if callback_data.content_index:
             content = content[callback_data.content_index]
         else:
             content = random.choice(content)
 
-    await send_content(callback_query.message, city_name, content, state_data)
+    await send_content(callback_query.message, city_name, content, state_data, many_content)
     await callback_query.answer()
 
 
