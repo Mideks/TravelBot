@@ -79,7 +79,7 @@ async def category_callback_handler(
         return
 
     content = get_content_category(city_name, cat)
-    many_content = len(content) > 0
+    many_content = isinstance(content, list) and len(content) > 0
     if isinstance(content, list):
         if callback_data.content_index:
             content = content[callback_data.content_index]
