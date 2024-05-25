@@ -8,7 +8,7 @@ from callback_data import CategoryButton, CityButton, NavigationButton, Navigati
 from db.city_data import CityData
 from texts.buttons import history_category, gallery_category, interesting_facts_category, photo_places_category, \
     weather_category, climate_category, celebrities_category, local_eat_category, nature_category, legends_category, \
-    interesting_places_category, local_holidays_category, monuments_category, attractions_category, prev_page, \
+    local_holidays_category, monuments_category, prev_page, \
     next_page, buy_premium, show_other_content, show_content_list, category_more_info_link
 
 
@@ -28,7 +28,7 @@ def get_categories_markup() -> InlineKeyboardMarkup:
          .button(text=weather_category,
                  callback_data=CategoryButton(category=Category.WeatherNow, is_locked=True))
          .button(text=climate_category,
-                 callback_data=CategoryButton(category=Category.Climate, is_locked=False, is_premium=True))
+                 callback_data=CategoryButton(category=Category.Climate, is_locked=False))
 
          .button(text=celebrities_category,
                  callback_data=CategoryButton(category=Category.Celebrities, is_locked=False))
@@ -40,15 +40,10 @@ def get_categories_markup() -> InlineKeyboardMarkup:
          .button(text=legends_category,
                  callback_data=CategoryButton(category=Category.Legends, is_locked=False))
 
-         .button(text=interesting_places_category,
-                 callback_data=CategoryButton(category=Category.InterestingPlaces, is_locked=False))
          .button(text=local_holidays_category,
                  callback_data=CategoryButton(category=Category.LocalHolidays, is_locked=False))
-
          .button(text=monuments_category,
                  callback_data=CategoryButton(category=Category.Monuments, is_locked=True))
-         .button(text=attractions_category,
-                 callback_data=CategoryButton(category=Category.Attractions, is_locked=True))
 
          .button(text=texts.buttons.back_to_menu,
                  callback_data=NavigationButton(location=NavigationLocation.Menu))
